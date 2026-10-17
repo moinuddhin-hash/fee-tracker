@@ -1,6 +1,6 @@
 // Offline support: the app loads from the phone even with no internet.
 // Bump VERSION whenever you upload a new index.html so phones pick up the update.
-var VERSION = "fees-v1";
+var VERSION = "fees-v2";
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
 self.addEventListener("install", function (e) {

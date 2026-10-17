@@ -131,7 +131,7 @@ function renderHv(){
       rows.push('<button class="st" style="width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer" data-a="iv" data-id="'+s.id+'" data-k="'+k+'"><div class="row"><b>'+esc(rl(s,k))+'</b><span class="'+(d?"wn":"ok")+'">'+(d?inr(d)+" due":"Paid ✓")+'</span></div><div class="mu">Fee '+inr(feeOf(s,k))+' · Paid '+inr(pd)+' · tap for invoice</div></button>');m++;if(m>11){m=0;y++}}
     h=ovHead(esc(s.name))+'<div class="sm"><div class="row"><div><div class="mu">Total paid</div><div class="big ok">'+inr(tp)+'</div></div><div style="text-align:right"><div class="mu">Pending</div><div class="big wn">'+inr(td)+'</div></div></div></div>'+rows.reverse().join("")}
   else if(HV.t==="rem"){var o=[];S.students.forEach(function(s){if(s.off)return;var w=owe(s);if(w.tot>0)o.push({s:s,w:w})});
-    h=ovHead('Remind all')+'<p class="mu">Tap each WhatsApp button to send that parent a ready reminder with the amount.</p>'+(o.length?o.map(function(x){return '<div class="st"><div class="row" style="align-items:center"><div><div class="nm">'+esc(x.s.name)+'</div><div class="mu">'+inr(x.w.tot)+' pending'+(x.s.phone?'':' · no number saved')+'</div></div><a class="wa" style="flex:none" target="_blank" rel="noopener" href="'+esc(waUrl(x.s,remText(x.s,x.w)))+'">WhatsApp</a></div></div>'}).join(""):'<div class="em">Nobody has pending fees 🎉</div>')}
+    h=ovHead('Remind all')+'<p class="mu">Tap each WhatsApp button to send that parent a ready reminder with the amount.</p>'+(o.length?o.map(function(x){return '<div class="st"><div class="row" style="align-items:center"><div><div class="nm">'+esc(x.s.name)+'</div><div class="mu">'+inr(x.w.tot)+' pending'+(x.s.phone?'':' · no number saved')+'</div></div><a class="wa" style="flex:none" href="'+esc(waUrl(x.s,remText(x.s,x.w)))+'">WhatsApp</a></div></div>'}).join(""):'<div class="em">Nobody has pending fees 🎉</div>')}
   else if(HV.t==="rep"){var L2=S.students.filter(function(s){return s.start<=key&&!s.off}),bill=0,got=0,cash=0,ds=0,pend=0,pn=0,un=[];
     L2.forEach(function(s){var ps=pays(s,key),d=dueOf(s,key);bill+=fb(s,key);ds+=dc(s,key);got+=sum(ps);cash+=sum(ps.filter(function(x){return x.m==="Cash"}));pend+=d;if(d>0)un.push(s.name+" – "+inr(d));else pn++});
     RT="Fee report – "+mlab(key)+(S.biz?" ("+S.biz+")":"")+"\n(cycles starting this month)\nBilled: "+inr(bill-ds)+"\nCollected: "+inr(got)+" (Cash "+inr(cash)+", Online "+inr(got-cash)+")\nPending: "+inr(pend)+"\nFully paid: "+pn+" of "+L2.length+(un.length?"\n\nPending:\n"+un.join("\n"):"");
@@ -188,7 +188,7 @@ function render(){
     else h+='<span class="bd">'+inr(d)+' due</span>';
     if(pt)h+='<span class="bd">+ '+inr(pt)+' earlier dues</span>';
     if(dc(s,key))h+='<span class="bd g">Discount '+inr(dc(s,key))+'</span>';
-    ps.forEach(function(x,i){var k=id+":"+i;h+='<div class="pl"><span>'+esc(fd(x.d))+' · '+esc(x.m)+' · <b>'+inr(x.a)+'</b></span><span><a target="_blank" rel="noopener" href="'+esc(waUrl(s,rcpt(s,key,i)))+'" style="color:var(--ac);font-size:12px;margin-right:12px">Receipt</a><button data-a="dp" data-id="'+id+'" data-i="'+i+'">'+(DP===k?"Tap again to delete":"Delete")+'</button></span></div>'});
+    ps.forEach(function(x,i){var k=id+":"+i;h+='<div class="pl"><span>'+esc(fd(x.d))+' · '+esc(x.m)+' · <b>'+inr(x.a)+'</b></span><span><a href="'+esc(waUrl(s,rcpt(s,key,i)))+'" style="color:var(--ac);font-size:12px;margin-right:12px">Receipt</a><button data-a="dp" data-id="'+id+'" data-i="'+i+'">'+(DP===k?"Tap again to delete":"Delete")+'</button></span></div>'});
     if(PAY===id){
       h+='<div class="pn"><div class="mu">Amount received (₹'+d+' left)</div><input id="pa" type="number" inputmode="numeric" value="'+esc(PA)+'"><div class="sg"><button data-a="pm" data-v="Cash" class="'+(PM==="Cash"?"on":"")+'">Cash</button><button data-a="pm" data-v="Online" class="'+(PM==="Online"?"on":"")+'">Online</button></div>'+(PE?'<div class="er">'+esc(PE)+'</div>':'')+'<div class="ed" style="margin-top:0"><button class="bt" data-a="sp" data-id="'+id+'">Save payment</button><button class="bt g" data-a="cp">Cancel</button></div></div>'}
     else{
@@ -199,7 +199,7 @@ function render(){
     else h+='<div class="ed" style="gap:14px"><button class="lk" data-a="hs" data-id="'+id+'">History</button><button class="lk" data-a="dc" data-id="'+id+'">Discount</button><button class="lk" data-a="ed" data-id="'+id+'">Edit student</button></div>';
     return h+'</div>'}).join("");
   renderHv();renderIv();renderLock()}
-function waUrl(s,txt){var n=String(s.phone||"").replace(/\D/g,"");if(n.length===10)n="91"+n;return "https://wa.me/"+n+"?text="+encodeURIComponent(txt)}
+function waUrl(s,txt){var n=String(s.phone||"").replace(/\D/g,"");if(n.length===10)n="91"+n;var q=encodeURIComponent(txt);if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))return "whatsapp://send?"+(n?"phone="+n+"&":"")+"text="+q;return "https://wa.me/"+n+"?text="+q}
 function invText(v){var b=S.biz||"Tuition Fee Invoice",t="*"+b+"*\nFee summary for "+rl(v.s,v.k)+"\n\nStudent: "+v.s.name+"\nMonthly fee: "+inr(v.fee)+(v.dsc?" (discount "+inr(v.dsc)+")":"")+"\n";
   if(v.ps.length){t+="\nPayments received:\n";v.ps.forEach(function(x){t+="• "+fd(x.d)+" – "+x.m+" – "+inr(x.a)+"\n"})}
   t+="\nTotal paid: "+inr(v.paid)+"\nBalance for "+rl(v.s,v.k)+": "+inr(v.bal)+"\n";
@@ -216,7 +216,7 @@ function renderIv(){
   var pr=v.ps.length?v.ps.map(function(x){return '<tr><td>Paid on '+esc(fd(x.d))+' ('+esc(x.m)+')</td><td>– '+inr(x.a)+'</td></tr>'}).join(""):'<tr><td>No payment received yet</td><td>–</td></tr>';
   var pv=v.pd.map(function(x){return '<tr><td>Pending from '+esc(rl(s,x.k))+'</td><td>'+inr(x.d)+'</td></tr>'}).join("");
   el.hidden=false;document.body.style.overflow="hidden";
-  el.innerHTML='<div class="tb"><button class="bt g" data-a="ci">← Back</button><a class="wa" id="wa" target="_blank" rel="noopener" href="'+esc(waUrl(s,invText(v)))+'">Send on WhatsApp</a><button class="bt" data-a="cpy">Copy text</button><button class="bt g" data-a="pr">Print</button></div>'+
+  el.innerHTML='<div class="tb"><button class="bt g" data-a="ci">← Back</button><a class="wa" id="wa" href="'+esc(waUrl(s,invText(v)))+'">Send on WhatsApp</a><button class="bt" data-a="cpy">Copy text</button><button class="bt g" data-a="pr">Print</button></div>'+
   '<div class="pp"><div class="t"><div style="flex:1"><input class="bz" id="bz" placeholder="Your tuition name" value="'+esc(S.biz)+'"><div style="color:#777;margin-top:4px">Fee invoice · Issued '+esc(fd(iso()))+'</div></div><div class="stp '+st[0]+'">'+st[1]+'</div></div>'+
   '<div style="color:#777;font-size:12px">BILLED TO (PARENT OF)</div><div style="font-size:17px;font-weight:700;margin-bottom:8px">'+esc(s.name)+'</div>'+
   '<table>'+rows+pr+'<tr class="h"><td>Summary</td><td></td></tr><tr><td>Total paid</td><td>'+inr(v.paid)+'</td></tr><tr><td>Balance for '+esc(rl(s,v.k))+'</td><td>'+inr(v.bal)+'</td></tr>'+pv+'<tr class="tt"><td>Total outstanding</td><td>'+inr(v.tot)+'</td></tr></table>'+
