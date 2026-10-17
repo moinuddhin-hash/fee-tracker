@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tuition Fee Tracker</title>
+<meta name="theme-color" content="#2b4acb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fee Tracker">
+
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d1d1b;--mu:#6b6b66;--bd:#e4e2da;--ok:#1f8a4c;--okbg:#e3f4ea;--wn:#c2410c;--wnbg:#fdeadf;--ac:#2b4acb;--ax:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151514;--card:#201f1e;--tx:#f1efe8;--mu:#a09e96;--bd:#33312e;--ok:#4ade80;--okbg:#17301f;--wn:#fb923c;--wnbg:#3a2314;--ac:#7c93ff;--ax:#111;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151514;--card:#201f1e;--tx:#f1efe8;--mu:#a09e96;--bd:#33312e;--ok:#4ade80;--okbg:#17301f;--wn:#fb923c;--wnbg:#3a2314;--ac:#7c93ff;--ax:#111;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:16px;max-width:560px;margin:0 auto}
+h1{font-size:20px;margin:4px 0 14px}
+.mn{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:6px}
+.mn b{font-size:17px}
+.ib{border:0;background:transparent;color:var(--tx);font-size:22px;width:44px;height:44px;border-radius:10px;cursor:pointer}
+.sm{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
+.row{display:flex;justify-content:space-between;gap:10px}
+.big{font-size:22px;font-weight:700}
+.mu{color:var(--mu);font-size:13px}
+.ok{color:var(--ok)}.wn{color:var(--wn)}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--ok);width:0}
+.ch{display:flex;gap:8px;margin:12px 0}
+.ch button{flex:1;padding:9px 6px;border-radius:20px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:14px;cursor:pointer}
+.ch button.on{background:var(--ac);color:var(--ax);border-color:var(--ac)}
+.st{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px}
+.nm{font-weight:600;font-size:16px}
+.bd{display:inline-block;font-size:12px;background:var(--wnbg);color:var(--wn);padding:2px 8px;border-radius:10px;margin:4px 4px 0 0}
+.bd.g{background:var(--okbg);color:var(--ok)}
+.pb{border:0;border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;cursor:pointer;background:var(--ac);color:var(--ax)}
+.pb.s{background:var(--bd);color:var(--tx)}
+.lk{border:0;background:none;color:var(--mu);font-size:13px;padding:6px 0 0;cursor:pointer;text-decoration:underline}
+input{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);width:100%}
+.ad{display:flex;gap:8px;margin-bottom:8px}
+.ad input{min-width:0}
+.bt{border:0;background:var(--ac);color:var(--ax);border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px;cursor:pointer}
+.bt.g{background:var(--bd);color:var(--tx)}.bt.r{background:var(--wnbg);color:var(--wn)}
+.ed{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.em{text-align:center;color:var(--mu);padding:28px 10px}
+.pl{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-top:1px dashed var(--bd)}
+.pl button{border:0;background:none;color:var(--mu);font-size:12px;cursor:pointer;text-decoration:underline}
+.pn{margin-top:10px;padding:10px;background:var(--bg);border-radius:12px}
+.sg{display:flex;gap:8px;margin:8px 0}
+.sg button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:14px;cursor:pointer}
+.sg button.on{background:var(--ac);color:var(--ax);border-color:var(--ac)}
+.er{color:var(--wn);font-size:13px;margin:4px 0}
+#iv,#hv,#lk{position:fixed;inset:0;background:var(--bg);overflow:auto;z-index:20;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px))}
+#hv{z-index:19}#lk{z-index:50}
+.tb{display:flex;gap:8px;flex-wrap:wrap;max-width:560px;margin:0 auto 12px}
+.tb .bt{flex:1;white-space:nowrap}
+.wa{background:#1fa855;color:#fff;text-decoration:none;text-align:center;border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px;flex:1.4}
+.pp{background:#fff;color:#111;max-width:560px;margin:0 auto;border-radius:14px;padding:22px 18px;border:1px solid #ddd;font-size:14px}
+.pp h2{margin:0;font-size:20px}
+.pp .t{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:12px;gap:10px}
+.pp .stp{font-weight:800;letter-spacing:1px;font-size:13px;padding:4px 10px;border-radius:6px;border:2px solid}
+.pp .stp.pd{color:#1f8a4c}.pp .stp.pt{color:#b7791f}.pp .stp.un{color:#c2410c}
+.pp table{width:100%;border-collapse:collapse;margin:8px 0}
+.pp td{padding:7px 0;border-bottom:1px solid #eee}
+.pp td:last-child{text-align:right;white-space:nowrap}
+.pp .h td{font-size:12px;color:#777;text-transform:uppercase;border-bottom:1px solid #ccc}
+.pp .tt td{font-weight:700;font-size:16px;border-top:2px solid #111;border-bottom:0}
+.pp .no{margin-top:14px;padding:10px;background:#fff4e5;border-radius:8px;color:#7a4a00}
+.pp .bz{border:0;border-bottom:1px dashed #aaa;border-radius:0;background:transparent;color:#111;font-weight:700;font-size:20px;padding:0 0 2px;width:100%}
+@media print{body>*:not(#iv){display:none!important}#iv{position:static;padding:0}.tb{display:none}.pp{border:0}}
+</style>
+</head>
+<body>
+<h1>Tuition Fee Tracker</h1>
+<div id="al"></div>
+<div class="mn"><button class="ib" data-a="prev" aria-label="Previous month">‹</button><b id="ml"></b><button class="ib" data-a="next" aria-label="Next month">›</button></div>
+<div class="sm" id="sm"></div>
+<div class="ch"><button data-a="rep">📊 Report</button><button data-a="rem">📣 Remind all</button><button data-a="tl">⚙ Backup &amp; PIN</button></div>
+<input id="q" placeholder="Search student…" autocomplete="off" style="margin-bottom:10px">
+<div class="ch" id="ch"></div>
+<div id="ls"></div>
+<div class="sm">
+<div class="mu" style="margin-bottom:8px">Add a student</div>
+<div class="ad"><input id="an" placeholder="Student name" autocomplete="off"></div>
+<div class="ad"><input id="af" type="number" inputmode="numeric" placeholder="Monthly fee ₹"><input id="ap" type="tel" inputmode="tel" placeholder="Parent’s WhatsApp"></div>
+<div class="ad"><span class="mu" style="align-self:center;white-space:nowrap">Joining date</span><input id="aj" type="date"></div>
+<button class="bt" data-a="add" style="width:100%">Add student</button>
+</div>
+<p class="mu" style="text-align:center">Saved on this device’s browser. Use the same phone and browser each time.</p>
+<div id="hv" hidden></div>
+<div id="iv" hidden></div>
+<div id="lk" hidden></div>
+<script>
+var KEY="tuition-fees-v1",S={students:[],pay:{},biz:""},F="all",ED=null,RM=null,PAY=null,PM="Cash",PA="",PE="",DP=null,IV=null;
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.students)S=p}}catch(e){}
+S.pay=S.pay||{};S.biz=S.biz||"";
+S.students.forEach(function(s){if(!s.join)s.join=s.start+"-01"});
+S.disc=S.disc||{};var Q="",HV=null,UNL=!S.pin,DC=null,RV="",RSC=false,MSG="",RT="",LE="",FG=false;
+Object.keys(S.pay).forEach(function(k){Object.keys(S.pay[k]).forEach(function(id){var r=S.pay[k][id];if(!Array.isArray(r))S.pay[k][id]=[{d:r.d,a:r.a,m:"Cash"}]})});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var now=new Date(),Y=now.getFullYear(),M=now.getMonth();
+function mk(y,m){return y+"-"+String(m+1).padStart(2,"0")}
+function cur(){return mk(Y,M)}
+function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function inr(n){return "₹"+Number(n).toLocaleString("en-IN")}
+function mlab(k){return new Date(+k.slice(0,4),+k.slice(5)-1,1).toLocaleString("en-IN",{month:"long",year:"numeric"})}
+function fd(d){return /^\d{4}-\d{2}-\d{2}$/.test(d)?new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}):d}
+function iso(){var t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0")}
+function pays(s,k){return (S.pay[k]||{})[s.id]||[]}
+function dim(y,m){return new Date(y,m+1,0).getDate()}
+function nk(){return mk(now.getMonth()===11?now.getFullYear()+1:now.getFullYear(),(now.getMonth()+1)%12)}
+function ekey(s){return s.off?s.offKey:nk()}
+function gs(i){return S.students.filter(function(x){return x.id===i})[0]}
+function fb(s,k){var f=Number(s.fee);(s.fees||[]).forEach(function(x){if(x.from<=k)f=Number(x.fee)});return f}
+function dc(s,k){return Number(S.disc[k+"|"+s.id])||0}
+function feeOf(s,k){return Math.max(0,fb(s,k)-dc(s,k))}
+function owe(s){var t=tod(),y=+s.join.slice(0,4),m=+s.join.slice(5,7)-1,tot=0,l=[];while(true){var k=mk(y,m);if(cyc(s,k).a>t)break;var d=dueOf(s,k);if(d>0){tot+=d;l.push({k:k,d:d})}m++;if(m>11){m=0;y++}}return{tot:tot,l:l}}
+function remText(s,w){return "Hello! This is a gentle reminder"+(S.biz?" from "+S.biz:"")+" that "+s.name+"’s tuition fee of "+inr(w.tot)+" is pending"+(w.l.length>1?" ("+w.l.length+" months)":" ("+rl(s,w.l[0].k)+")")+". Kindly pay at the earliest. Thank you!"}
+function rcpt(s,k,i){var ps=pays(s,k),x=ps[i],b=Math.max(0,feeOf(s,k)-sum(ps.slice(0,i+1)));return (S.biz?"*"+S.biz+"*\n":"")+"Payment receipt\nStudent: "+s.name+"\nReceived: "+inr(x.a)+" ("+x.m+") on "+fd(x.d)+"\nCycle: "+rl(s,k)+"\nBalance for this cycle: "+inr(b)+(b?"":" – fully paid ✓")+"\nThank you!"}
+function ovHead(t){return '<div class="tb"><button class="bt g" data-a="hc">← Back</button><b style="align-self:center;flex:2">'+t+'</b></div>'}
+function renderHv(){
+  var el=document.getElementById("hv");
+  if(!HV){el.hidden=true;return}
+  var key=cur(),h="";
+  if(HV.t==="hist"){var s=gs(HV.id);if(!s){HV=null;el.hidden=true;return}
+    var y=+s.join.slice(0,4),m=+s.join.slice(5,7)-1,ek=ekey(s),rows=[],tp=0,td=0;
+    while(mk(y,m)<ek){var k=mk(y,m),d=dueOf(s,k),pd=sum(pays(s,k));tp+=pd;td+=d;
+      rows.push('<button class="st" style="width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer" data-a="iv" data-id="'+s.id+'" data-k="'+k+'"><div class="row"><b>'+esc(rl(s,k))+'</b><span class="'+(d?"wn":"ok")+'">'+(d?inr(d)+" due":"Paid ✓")+'</span></div><div class="mu">Fee '+inr(feeOf(s,k))+' · Paid '+inr(pd)+' · tap for invoice</div></button>');m++;if(m>11){m=0;y++}}
+    h=ovHead(esc(s.name))+'<div class="sm"><div class="row"><div><div class="mu">Total paid</div><div class="big ok">'+inr(tp)+'</div></div><div style="text-align:right"><div class="mu">Pending</div><div class="big wn">'+inr(td)+'</div></div></div></div>'+rows.reverse().join("")}
+  else if(HV.t==="rem"){var o=[];S.students.forEach(function(s){if(s.off)return;var w=owe(s);if(w.tot>0)o.push({s:s,w:w})});
+    h=ovHead('Remind all')+'<p class="mu">Tap each WhatsApp button to send that parent a ready reminder with the amount.</p>'+(o.length?o.map(function(x){return '<div class="st"><div class="row" style="align-items:center"><div><div class="nm">'+esc(x.s.name)+'</div><div class="mu">'+inr(x.w.tot)+' pending'+(x.s.phone?'':' · no number saved')+'</div></div><a class="wa" style="flex:none" target="_blank" rel="noopener" href="'+esc(waUrl(x.s,remText(x.s,x.w)))+'">WhatsApp</a></div></div>'}).join(""):'<div class="em">Nobody has pending fees 🎉</div>')}
+  else if(HV.t==="rep"){var L2=S.students.filter(function(s){return s.start<=key&&!s.off}),bill=0,got=0,cash=0,ds=0,pend=0,pn=0,un=[];
+    L2.forEach(function(s){var ps=pays(s,key),d=dueOf(s,key);bill+=fb(s,key);ds+=dc(s,key);got+=sum(ps);cash+=sum(ps.filter(function(x){return x.m==="Cash"}));pend+=d;if(d>0)un.push(s.name+" – "+inr(d));else pn++});
+    RT="Fee report – "+mlab(key)+(S.biz?" ("+S.biz+")":"")+"\n(cycles starting this month)\nBilled: "+inr(bill-ds)+"\nCollected: "+inr(got)+" (Cash "+inr(cash)+", Online "+inr(got-cash)+")\nPending: "+inr(pend)+"\nFully paid: "+pn+" of "+L2.length+(un.length?"\n\nPending:\n"+un.join("\n"):"");
+    h=ovHead('Report – '+esc(mlab(key)))+'<div class="sm"><div class="mu">Cycles that start in this month</div><table style="width:100%;margin-top:8px">'+[["Fees billed",inr(bill)],["Discounts","– "+inr(ds)],["Collected",inr(got)],["↳ Cash",inr(cash)],["↳ Online",inr(got-cash)],["Pending",inr(pend)],["Fully paid",pn+" of "+L2.length]].map(function(r){return '<tr><td>'+r[0]+'</td><td style="text-align:right;font-weight:600">'+r[1]+'</td></tr>'}).join("")+'</table></div>'+(un.length?'<div class="sm"><b>Pending</b>'+un.map(function(u){return '<div class="pl"><span>'+esc(u)+'</span></div>'}).join("")+'</div>':'')+'<button class="bt" data-a="cr" style="width:100%">Copy text</button>'}
+  else if(HV.t==="tools"){
+    h=ovHead('Backup &amp; PIN')+'<div class="sm"><b>Backup</b><p class="mu">Copy your data and save it somewhere safe (WhatsApp “message yourself”, Notes). Do this every week.</p><button class="bt" data-a="bk" style="width:100%">Copy backup</button></div><div class="sm"><b>Restore</b><p class="mu">Paste a backup below. This replaces the data on this device.</p><textarea id="rs" rows="4" style="width:100%;font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)">'+esc(RV)+'</textarea><button class="bt r" data-a="rs" style="width:100%;margin-top:8px">'+(RSC?'Tap again to restore':'Restore backup')+'</button></div>'+(MSG?'<div class="er" style="text-align:center">'+esc(MSG)+'</div>':'')+'<div class="sm"><b>App lock</b>'+(S.pin?'<p class="mu">PIN is on.</p><button class="bt g" data-a="rp" style="width:100%">Remove PIN</button>':'<p class="mu">Set a 4-digit PIN to keep fee details private. If you forget it, the only way in is erasing all data, so keep a backup.</p><input id="np" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"><button class="bt" data-a="spin" style="width:100%;margin-top:8px">Set PIN</button>')+'</div>'}
+  el.hidden=false;el.innerHTML='<div style="max-width:560px;margin:0 auto">'+h+'</div>'}
+function renderLock(){var el=document.getElementById("lk");
+  if(!S.pin||UNL){el.hidden=true;return}
+  el.hidden=false;el.innerHTML='<div style="max-width:300px;margin:16vh auto 0;text-align:center"><div style="font-size:40px">🔒</div><h2>Tuition Fee Tracker</h2><input id="lp" type="password" inputmode="numeric" maxlength="4" placeholder="Enter PIN" autocomplete="off" style="text-align:center;font-size:22px"><div class="er">'+esc(LE)+'</div><button class="bt" data-a="ul" style="width:100%;margin-top:8px">Unlock</button><button class="lk" data-a="fg">Forgot PIN?</button></div>';
+  var lp=document.getElementById("lp");if(lp)lp.focus()}
+function tod(){var t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate())}
+function cyc(s,k){var jd=+s.join.slice(8),y=+k.slice(0,4),m=+k.slice(5)-1,ny=m===11?y+1:y,nm=(m+1)%12;
+  var a=new Date(y,m,Math.min(jd,dim(y,m))),n=new Date(ny,nm,Math.min(jd,dim(ny,nm)));
+  return{a:a,n:n,b:new Date(n.getFullYear(),n.getMonth(),n.getDate()-1)}}
+function sd(d){return d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})}
+function rl(s,k){var c=cyc(s,k);return sd(c.a)+" – "+sd(c.b)+" "+c.b.getFullYear()}
+function cst(s,k){var c=cyc(s,k),t=tod(),D=864e5,cl=dueOf(s,k)>0?"wn":"ok";
+  if(t>=c.n){var d=Math.round((t-c.b)/D);return '<b class="'+cl+'">Completed '+(d<=1?"yesterday":d+" days ago")+'</b>'}
+  if(t<c.a){var f=Math.round((c.a-t)/D);return 'Starts in '+f+' day'+(f>1?'s':'')}
+  var r=Math.round((c.n-t)/D);return 'Completes in '+r+' day'+(r>1?'s':'')}
+function alerts(){var o=[],t=tod();S.students.forEach(function(s){if(s.off)return;var y=+s.join.slice(0,4),m=+s.join.slice(5,7)-1,tot=0,n=0,last=null,first=null;
+  while(true){var k=mk(y,m),c=cyc(s,k);if(t<c.n)break;var d=dueOf(s,k);if(d>0){tot+=d;n++;last=k;if(!first)first=k}m++;if(m>11){m=0;y++}}
+  if(n)o.push({s:s,tot:tot,n:n,last:last,first:first})});return o}
+function sum(a){return a.reduce(function(t,x){return t+Number(x.a)},0)}
+function dueOf(s,k){return Math.max(0,feeOf(s,k)-sum(pays(s,k)))}
+function prev(s,key){var o=[],y=+s.start.slice(0,4),m=+s.start.slice(5)-1;
+  while(mk(y,m)<key){var d=dueOf(s,mk(y,m));if(d>0)o.push({k:mk(y,m),d:d});m++;if(m>11){m=0;y++}}return o}
+function inv(s,k){var ps=pays(s,k),paid=sum(ps),fee=fb(s,k),dsc=dc(s,k),pd=prev(s,k),pt=pd.reduce(function(t,x){return t+x.d},0),bal=Math.max(0,fee-dsc-paid);
+  var cash=sum(ps.filter(function(x){return x.m==="Cash"}));
+  return{s:s,k:k,ps:ps,dsc:dsc,paid:paid,fee:fee,bal:bal,pd:pd,pt:pt,tot:bal+pt,cash:cash,online:paid-cash}}
+function render(){
+  var key=cur();
+  document.getElementById("ml").textContent=mlab(key);
+  var AL=alerts();document.getElementById("al").innerHTML=AL.length?'<div class="sm" style="border-color:var(--wn)"><div style="font-weight:700;color:var(--wn)">🔔 Month completed – fees due</div>'+AL.map(function(x){return '<div class="pl" style="align-items:flex-start;gap:8px"><span><b>'+esc(x.s.name)+'</b><br><span class="mu">'+(x.n>1?x.n+' cycles pending':'Cycle '+esc(rl(x.s,x.last))+' completed')+' · <b>'+inr(x.tot)+'</b></span></span><span style="display:flex;gap:6px"><button class="pb s" data-a="go" data-id="'+x.s.id+'" data-k="'+x.first+'">Open</button><button class="pb" data-a="iv" data-id="'+x.s.id+'" data-k="'+x.last+'">Invoice</button></span></div>'}).join("")+'</div>':"";
+  var L=S.students.filter(function(s){return s.start<=key&&!s.off});
+  var paidN=0,got=0,cash=0,due=0;
+  L.forEach(function(s){var ps=pays(s,key);got+=sum(ps);cash+=sum(ps.filter(function(x){return x.m==="Cash"}));var d=dueOf(s,key);due+=d;if(d===0)paidN++});
+  var tot=got+due,pct=tot?Math.round(got/tot*100):0;
+  document.getElementById("sm").innerHTML=
+    '<div class="row"><div><div class="mu">Collected</div><div class="big ok">'+inr(got)+'</div><div class="mu">Cash '+inr(cash)+' · Online '+inr(got-cash)+'</div></div><div style="text-align:right"><div class="mu">Pending</div><div class="big wn">'+inr(due)+'</div></div></div>'+
+    '<div class="bar"><i style="width:'+pct+'%"></i></div><div class="mu" style="margin-top:6px">'+paidN+' of '+L.length+' students fully paid</div>';
+  var tabs=[["all","All ("+L.length+")"],["un","Unpaid ("+(L.length-paidN)+")"],["pd","Paid ("+paidN+")"],["in","Inactive ("+S.students.filter(function(s){return s.off}).length+")"]];
+  document.getElementById("ch").innerHTML=tabs.map(function(t){return '<button data-a="f" data-v="'+t[0]+'" class="'+(F===t[0]?"on":"")+'">'+t[1]+'</button>'}).join("");
+  var V=(F==="in"?S.students.filter(function(s){return s.off}):L.filter(function(s){var d=dueOf(s,key);return F==="all"||(F==="un"?d>0:d===0)})).filter(function(s){return !Q||s.name.toLowerCase().indexOf(Q)>-1});
+  var ls=document.getElementById("ls");
+  if(!V.length)ls.innerHTML='<div class="em">'+(L.length||F==="in"||Q?"Nothing here.":"No students yet. Add your first one below.")+'</div>';
+  else ls.innerHTML=V.map(function(s){
+    if(s.off){var po=prev(s,s.offKey).reduce(function(t,x){return t+x.d},0);return '<div class="st"><div class="nm">'+esc(s.name)+' <span class="mu">(inactive)</span></div><div class="mu">Joined '+esc(fd(s.join))+'</div>'+(po?'<span class="bd">'+inr(po)+' unpaid from before leaving</span>':'<span class="bd g">No dues</span>')+'<div class="ed"><button class="pb s" data-a="hs" data-id="'+s.id+'">History</button><button class="pb" data-a="on" data-id="'+s.id+'">Reactivate</button></div></div>'}
+    var ps=pays(s,key),paid=sum(ps),d=dueOf(s,key),pv=prev(s,key),pt=pv.reduce(function(t,x){return t+x.d},0),id=s.id;
+    var h='<div class="st"><div class="nm">'+esc(s.name)+'</div><div class="mu">'+inr(fb(s,key))+' / month · Joined '+esc(fd(s.join))+'</div><div class="mu">Cycle '+esc(rl(s,key))+' · '+cst(s,key)+'</div>';
+    if(d===0)h+='<span class="bd g">Paid in full ✓</span>';
+    else if(paid>0)h+='<span class="bd">'+inr(paid)+' paid · '+inr(d)+' left</span>';
+    else h+='<span class="bd">'+inr(d)+' due</span>';
+    if(pt)h+='<span class="bd">+ '+inr(pt)+' earlier dues</span>';
+    if(dc(s,key))h+='<span class="bd g">Discount '+inr(dc(s,key))+'</span>';
+    ps.forEach(function(x,i){var k=id+":"+i;h+='<div class="pl"><span>'+esc(fd(x.d))+' · '+esc(x.m)+' · <b>'+inr(x.a)+'</b></span><span><a target="_blank" rel="noopener" href="'+esc(waUrl(s,rcpt(s,key,i)))+'" style="color:var(--ac);font-size:12px;margin-right:12px">Receipt</a><button data-a="dp" data-id="'+id+'" data-i="'+i+'">'+(DP===k?"Tap again to delete":"Delete")+'</button></span></div>'});
+    if(PAY===id){
+      h+='<div class="pn"><div class="mu">Amount received (₹'+d+' left)</div><input id="pa" type="number" inputmode="numeric" value="'+esc(PA)+'"><div class="sg"><button data-a="pm" data-v="Cash" class="'+(PM==="Cash"?"on":"")+'">Cash</button><button data-a="pm" data-v="Online" class="'+(PM==="Online"?"on":"")+'">Online</button></div>'+(PE?'<div class="er">'+esc(PE)+'</div>':'')+'<div class="ed" style="margin-top:0"><button class="bt" data-a="sp" data-id="'+id+'">Save payment</button><button class="bt g" data-a="cp">Cancel</button></div></div>'}
+    else{
+      h+='<div class="ed">'+(d>0?'<button class="pb" data-a="op" data-id="'+id+'">+ Add payment</button>':'')+'<button class="pb s" data-a="iv" data-id="'+id+'">Invoice</button></div>'}
+    if(DC===id)h+='<div class="pn"><div class="mu">Discount for this cycle (₹)</div><input id="dca" type="number" inputmode="numeric" value="'+dc(s,key)+'"><div class="ed"><button class="bt" data-a="dcs" data-id="'+id+'">Save</button><button class="bt g" data-a="dcc">Cancel</button></div></div>';
+    if(ED===id){
+      h+='<div class="ed"><input id="en" value="'+esc(s.name)+'" placeholder="Name"></div><div class="mu" style="margin-top:8px">Changing the fee applies from this month onward.</div><div class="ed"><input id="ef" type="number" inputmode="numeric" value="'+fb(s,key)+'" style="flex:1;min-width:0"><input id="ep" type="tel" value="'+esc(s.phone||"")+'" placeholder="Parent’s WhatsApp" style="flex:1;min-width:0"></div><div class="ed"><span class="mu">Joining date</span><input id="ej" type="date" value="'+esc(s.join)+'" style="flex:1;min-width:0"></div><div class="ed"><button class="bt" data-a="sv" data-id="'+id+'">Save</button><button class="bt g" data-a="ce">Cancel</button><button class="bt g" data-a="off" data-id="'+id+'">Mark inactive</button><button class="bt r" data-a="rm" data-id="'+id+'">'+(RM===id?"Tap again to remove":"Remove student")+'</button></div>'}
+    else h+='<div class="ed" style="gap:14px"><button class="lk" data-a="hs" data-id="'+id+'">History</button><button class="lk" data-a="dc" data-id="'+id+'">Discount</button><button class="lk" data-a="ed" data-id="'+id+'">Edit student</button></div>';
+    return h+'</div>'}).join("");
+  renderHv();renderIv();renderLock()}
+function waUrl(s,txt){var n=String(s.phone||"").replace(/\D/g,"");if(n.length===10)n="91"+n;return "https://wa.me/"+n+"?text="+encodeURIComponent(txt)}
+function invText(v){var b=S.biz||"Tuition Fee Invoice",t="*"+b+"*\nFee summary for "+rl(v.s,v.k)+"\n\nStudent: "+v.s.name+"\nMonthly fee: "+inr(v.fee)+(v.dsc?" (discount "+inr(v.dsc)+")":"")+"\n";
+  if(v.ps.length){t+="\nPayments received:\n";v.ps.forEach(function(x){t+="• "+fd(x.d)+" – "+x.m+" – "+inr(x.a)+"\n"})}
+  t+="\nTotal paid: "+inr(v.paid)+"\nBalance for "+rl(v.s,v.k)+": "+inr(v.bal)+"\n";
+  if(v.pt){t+="\nEarlier pending:\n";v.pd.forEach(function(x){t+="• "+rl(v.s,x.k)+": "+inr(x.d)+"\n"})}
+  t+="\n*Total outstanding: "+inr(v.tot)+"*\n";
+  t+=v.tot>0?"\nKindly clear the pending amount at the earliest. Thank you!":"\nAll fees are cleared. Thank you!";return t}
+function renderIv(){
+  var el=document.getElementById("iv");
+  if(!IV){el.hidden=true;document.body.style.overflow="";return}
+  var s=S.students.filter(function(x){return x.id===IV.id})[0];
+  if(!s){IV=null;el.hidden=true;return}
+  var v=inv(s,IV.k),st=v.bal===0?["pd","PAID"]:v.paid>0?["pt","PARTIAL"]:["un","UNPAID"];
+  var rows='<tr class="h"><td>Description</td><td>Amount</td></tr><tr><td>Tuition fee – '+esc(rl(s,v.k))+'</td><td>'+inr(v.fee)+'</td></tr>'+(v.dsc?'<tr><td>Discount</td><td>– '+inr(v.dsc)+'</td></tr>':'');
+  var pr=v.ps.length?v.ps.map(function(x){return '<tr><td>Paid on '+esc(fd(x.d))+' ('+esc(x.m)+')</td><td>– '+inr(x.a)+'</td></tr>'}).join(""):'<tr><td>No payment received yet</td><td>–</td></tr>';
+  var pv=v.pd.map(function(x){return '<tr><td>Pending from '+esc(rl(s,x.k))+'</td><td>'+inr(x.d)+'</td></tr>'}).join("");
+  el.hidden=false;document.body.style.overflow="hidden";
+  el.innerHTML='<div class="tb"><button class="bt g" data-a="ci">← Back</button><a class="wa" id="wa" target="_blank" rel="noopener" href="'+esc(waUrl(s,invText(v)))+'">Send on WhatsApp</a><button class="bt" data-a="cpy">Copy text</button><button class="bt g" data-a="pr">Print</button></div>'+
+  '<div class="pp"><div class="t"><div style="flex:1"><input class="bz" id="bz" placeholder="Your tuition name" value="'+esc(S.biz)+'"><div style="color:#777;margin-top:4px">Fee invoice · Issued '+esc(fd(iso()))+'</div></div><div class="stp '+st[0]+'">'+st[1]+'</div></div>'+
+  '<div style="color:#777;font-size:12px">BILLED TO (PARENT OF)</div><div style="font-size:17px;font-weight:700;margin-bottom:8px">'+esc(s.name)+'</div>'+
+  '<table>'+rows+pr+'<tr class="h"><td>Summary</td><td></td></tr><tr><td>Total paid</td><td>'+inr(v.paid)+'</td></tr><tr><td>Balance for '+esc(rl(s,v.k))+'</td><td>'+inr(v.bal)+'</td></tr>'+pv+'<tr class="tt"><td>Total outstanding</td><td>'+inr(v.tot)+'</td></tr></table>'+
+  (v.tot>0?'<div class="no">Reminder: please clear the pending '+inr(v.tot)+' at the earliest. Thank you!</div>':'<div class="no" style="background:#e3f4ea;color:#1f6b3c">All fees are cleared. Thank you!</div>')+'</div>'}
+document.addEventListener("input",function(e){
+  if(e.target.id==="q"){Q=e.target.value.trim().toLowerCase();render();return}
+  if(e.target.id==="lp"&&e.target.value.length===4){if(e.target.value===S.pin){UNL=true;LE=""}else LE="Wrong PIN";render();return}
+  if(e.target.id==="bz"){S.biz=e.target.value;save();var w=document.getElementById("wa"),s=S.students.filter(function(x){return x.id===IV.id})[0];if(w&&s)w.href=waUrl(s,invText(inv(s,IV.k)))}});
+function copyTxt(t,b){var o=b.textContent;
+  function ok(){b.textContent="Copied ✓";setTimeout(function(){b.textContent=o},1500)}
+  try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}
+  function fb(){try{var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();ok()}catch(e){b.textContent="Copy not allowed"}}}
+document.addEventListener("click",function(ev){
+  var b=ev.target.closest("[data-a]");if(!b)return;
+  var a=b.dataset.a,id=b.dataset.id,key=cur();
+  function stu(i){return S.students.filter(function(x){return x.id===i})[0]}
+  if(a==="pr"){try{window.print()}catch(e){}return}
+  if(a==="cpy"){var s0=stu(IV.id);copyTxt(invText(inv(s0,IV.k)),b);return}
+  if(a==="cr"){copyTxt(RT,b);return}
+  if(a==="bk"){copyTxt(JSON.stringify(Object.assign({},S,{pin:""})),b);return}
+  if(a==="prev"){M--;if(M<0){M=11;Y--}}
+  else if(a==="next"){M++;if(M>11){M=0;Y++}}
+  else if(a==="f"){F=b.dataset.v}
+  else if(a==="ed"){ED=id;RM=null}
+  else if(a==="ce"){ED=null;RM=null}
+  else if(a==="op"){PAY=id;PM="Cash";PE="";PA=String(dueOf(stu(id),key))}
+  else if(a==="cp"){PAY=null;PE=""}
+  else if(a==="pm"){var pi=document.getElementById("pa");if(pi)PA=pi.value;PM=b.dataset.v}
+  else if(a==="sp"){
+    var s=stu(id),amt=Number(document.getElementById("pa").value),d=dueOf(s,key);PA=document.getElementById("pa").value;
+    if(!(amt>0))PE="Enter the amount received.";
+    else if(amt>d)PE="That is more than the remaining "+inr(d)+".";
+    else{S.pay[key]=S.pay[key]||{};S.pay[key][id]=S.pay[key][id]||[];S.pay[key][id].push({d:iso(),a:amt,m:PM});PAY=null;PE="";save()}}
+  else if(a==="dp"){var k=id+":"+b.dataset.i;if(DP!==k)DP=k;else{S.pay[key][id].splice(+b.dataset.i,1);DP=null;save()}}
+  else if(a==="sv"){
+    var n=document.getElementById("en").value.trim(),f=Number(document.getElementById("ef").value),ph=document.getElementById("ep").value.trim(),jj=document.getElementById("ej").value;
+    if(!n||!(f>=0))return;
+    S.students.forEach(function(x){if(x.id===id){x.name=n;x.phone=ph;if(f!==fb(x,key)){x.fees=(x.fees||[]).filter(function(z){return z.from!==key}).concat([{from:key,fee:f}]).sort(function(p,q){return p.from<q.from?-1:1})}if(jj){x.join=jj;x.start=jj.slice(0,7)}}});ED=null;save()}
+  else if(a==="rm"){
+    if(RM!==id)RM=id;
+    else{S.students=S.students.filter(function(x){return x.id!==id});Object.keys(S.pay).forEach(function(k){delete S.pay[k][id]});ED=null;RM=null;save()}}
+  else if(a==="add"){
+    var an=document.getElementById("an"),af=document.getElementById("af"),ap=document.getElementById("ap"),nm=an.value.trim(),fe=Number(af.value),jn=document.getElementById("aj").value||iso();
+    if(!nm||!(fe>0)){(nm?af:an).focus();return}
+    S.students.push({id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:nm,fee:fe,phone:ap.value.trim(),join:jn,start:jn.slice(0,7)});Y=+jn.slice(0,4);M=+jn.slice(5,7)-1;
+    an.value="";af.value="";ap.value="";save()}
+  else if(a==="iv"){IV={id:id,k:b.dataset.k||key};document.getElementById("iv").scrollTop=0}
+  else if(a==="ci"){IV=null}
+  else if(a==="hc"){HV=null}
+  else if(a==="rep"){HV={t:"rep"}}
+  else if(a==="rem"){HV={t:"rem"}}
+  else if(a==="tl"){HV={t:"tools"};MSG="";RV="";RSC=false}
+  else if(a==="hs"){HV={t:"hist",id:id}}
+  else if(a==="dc"){DC=id}
+  else if(a==="dcc"){DC=null}
+  else if(a==="dcs"){var dv=Number(document.getElementById("dca").value),dk=key+"|"+id;if(dv>0)S.disc[dk]=dv;else delete S.disc[dk];DC=null;save()}
+  else if(a==="off"){var so=stu(id);so.off=true;so.offKey=nk();ED=null;save()}
+  else if(a==="on"){var sn=stu(id);delete sn.off;delete sn.offKey;save()}
+  else if(a==="rs"){RV=document.getElementById("rs").value;try{var ob=JSON.parse(RV);if(!ob||!Array.isArray(ob.students)){MSG="That doesn’t look like a backup.";RSC=false}else if(!RSC){RSC=true;MSG="Tap again to replace the current data."}else{ob.pin=S.pin;S=ob;S.pay=S.pay||{};S.disc=S.disc||{};S.biz=S.biz||"";S.students.forEach(function(s){if(!s.join)s.join=s.start+"-01"});save();RSC=false;RV="";MSG="Backup restored ✓"}}catch(e){MSG="That doesn’t look like a backup.";RSC=false}}
+  else if(a==="spin"){var pv=document.getElementById("np").value;if(/^\d{4}$/.test(pv)){S.pin=pv;save();MSG="PIN set ✓"}else MSG="Enter exactly 4 digits."}
+  else if(a==="rp"){S.pin="";save();MSG="PIN removed."}
+  else if(a==="ul"){var lq=document.getElementById("lp").value;if(lq===S.pin){UNL=true;LE=""}else LE="Wrong PIN"}
+  else if(a==="fg"){if(!FG){FG=true;LE="Forgot PIN erases ALL data. Tap again to erase."}else{S={students:[],pay:{},disc:{},biz:""};save();UNL=true;FG=false;LE=""}}
+  else if(a==="go"){Y=+b.dataset.k.slice(0,4);M=+b.dataset.k.slice(5)-1;F="all";PAY=id;PM="Cash";PE="";PA=String(dueOf(stu(id),b.dataset.k));window.scrollTo(0,0)}
+  if(a!=="dp")DP=null;
+  render()});
+render();document.getElementById("aj").value=iso();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){try{navigator.serviceWorker.register("sw.js")}catch(e){}})}</script>
+</body>
+</html>
