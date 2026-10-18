@@ -39,7 +39,7 @@ h1{font-size:20px;margin:4px 0 14px}
 .pb{border:0;border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;cursor:pointer;background:var(--ac);color:var(--ax)}
 .pb.s{background:var(--bd);color:var(--tx)}
 .lk{border:0;background:none;color:var(--mu);font-size:13px;padding:6px 0 0;cursor:pointer;text-decoration:underline}
-input{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);width:100%}
+input,select{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);width:100%}
 .ad{display:flex;gap:8px;margin-bottom:8px}
 .ad input{min-width:0}
 .bt{border:0;background:var(--ac);color:var(--ax);border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px;cursor:pointer}
@@ -52,6 +52,8 @@ input{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);ba
 .sg{display:flex;gap:8px;margin:8px 0}
 .sg button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:14px;cursor:pointer}
 .sg button.on{background:var(--ac);color:var(--ax);border-color:var(--ac)}
+.tg{display:inline-block;font-size:12px;background:var(--bd);color:var(--tx);padding:2px 9px;border-radius:10px;margin:5px 6px 0 0}
+.ad select{flex:1;min-width:0}
 .er{color:var(--wn);font-size:13px;margin:4px 0}
 #iv,#hv,#lk{position:fixed;inset:0;background:var(--bg);overflow:auto;z-index:20;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px))}
 #hv{z-index:19}#lk{z-index:50}
@@ -80,11 +82,13 @@ input{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);ba
 <div class="sm" id="sm"></div>
 <div class="ch"><button data-a="rep">📊 Report</button><button data-a="rem">📣 Remind all</button><button data-a="tl">⚙ Backup &amp; PIN</button></div>
 <input id="q" placeholder="Search student…" autocomplete="off" style="margin-bottom:10px">
+<div class="ad" id="fl"></div>
 <div class="ch" id="ch"></div>
 <div id="ls"></div>
 <div class="sm">
 <div class="mu" style="margin-bottom:8px">Add a student</div>
 <div class="ad"><input id="an" placeholder="Student name" autocomplete="off"></div>
+<div class="ad"><select id="as"></select><select id="ast" hidden></select><select id="ab"></select></div>
 <div class="ad"><input id="af" type="number" inputmode="numeric" placeholder="Monthly fee ₹"><input id="ap" type="tel" inputmode="tel" placeholder="Parent’s WhatsApp"></div>
 <div class="ad"><span class="mu" style="align-self:center;white-space:nowrap">Joining date</span><input id="aj" type="date"></div>
 <button class="bt" data-a="add" style="width:100%">Add student</button>
@@ -97,8 +101,8 @@ input{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);ba
 var KEY="tuition-fees-v1",S={students:[],pay:{},biz:""},F="all",ED=null,RM=null,PAY=null,PM="Cash",PA="",PE="",DP=null,IV=null;
 try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.students)S=p}}catch(e){}
 S.pay=S.pay||{};S.biz=S.biz||"";
-S.students.forEach(function(s){if(!s.join)s.join=s.start+"-01"});
-S.disc=S.disc||{};var Q="",HV=null,UNL=!S.pin,DC=null,RV="",RSC=false,MSG="",RT="",LE="",FG=false;
+S.students.forEach(function(s){if(!s.join)s.join=s.start+"-01";if(!s.std){var m=/^(\d{1,2})\s*(st|nd|rd|th)\.?\s+(.+)$/i.exec(s.name||"");if(m&&+m[1]>=1&&+m[1]<=12){s.std=String(+m[1]);s.name=m[3]}}});
+S.disc=S.disc||{};var Q="",FS="",FB="",HV=null,UNL=!S.pin,DC=null,RV="",RSC=false,MSG="",RT="",LE="",FG=false;
 Object.keys(S.pay).forEach(function(k){Object.keys(S.pay[k]).forEach(function(id){var r=S.pay[k][id];if(!Array.isArray(r))S.pay[k][id]=[{d:r.d,a:r.a,m:"Cash"}]})});
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 var now=new Date(),Y=now.getFullYear(),M=now.getMonth();
@@ -111,6 +115,49 @@ function fd(d){return /^\d{4}-\d{2}-\d{2}$/.test(d)?new Date(d+"T00:00:00").toLo
 function iso(){var t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0")}
 function pays(s,k){return (S.pay[k]||{})[s.id]||[]}
 function dim(y,m){return new Date(y,m+1,0).getDate()}
+function ord(n){n=+n;var t=n%100;return n+((t>=11&&t<=13)?"th":["th","st","nd","rd"][n%10<4?n%10:0])}
+function stdL(s){return s.std?ord(s.std)+(s.stream?" "+s.stream:""):""}
+function dn(s){return (stdL(s)?stdL(s)+" ":"")+s.name}
+function tags(s){return [stdL(s),s.board].filter(Boolean)}
+function tgh(s){var t=tags(s);return t.length?'<div>'+t.map(function(x){return '<span class="tg">'+esc(x)+'</span>'}).join("")+'</div>':""}
+function optStd(v){var o='<option value="">Standard</option>';for(var i=1;i<=12;i++)o+='<option value="'+i+'"'+(String(v)===String(i)?' selected':'')+'>'+ord(i)+'</option>';return o}
+function optStr(v){return '<option value="">Stream</option>'+["Science","Commerce","Arts"].map(function(t){return '<option'+(v===t?' selected':'')+'>'+t+'</option>'}).join("")}
+function optBrd(v){return '<option value="">Board</option>'+["SSC","CBSE","ICSE"].map(function(t){return '<option'+(v===t?' selected':'')+'>'+t+'</option>'}).join("")}
+function renderFl(){var el=document.getElementById("fl"),c1={},c2={};
+  S.students.forEach(function(s){if(s.off)return;if(s.std)c1[s.std]=(c1[s.std]||0)+1;if(s.board)c2[s.board]=(c2[s.board]||0)+1});
+  if(FS&&!c1[FS])FS="";if(FB&&!c2[FB])FB="";
+  var h1='<select id="fs"><option value="">All standards</option>',h2='<select id="fb"><option value="">All boards</option>';
+  for(var i=1;i<=12;i++)if(c1[i])h1+='<option value="'+i+'"'+(FS===String(i)?' selected':'')+'>'+ord(i)+' ('+c1[i]+')</option>';
+  ["SSC","CBSE","ICSE"].forEach(function(b){if(c2[b])h2+='<option value="'+b+'"'+(FB===b?' selected':'')+'>'+b+' ('+c2[b]+')</option>'});
+  el.innerHTML=h1+'</select>'+h2+'</select>'}
+var IMGB=null,IMGN="";
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();x.fill()}
+function invCanvas(v){
+  var s=v.s,F="system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif",W=800,rows=[["Fee",inr(v.fee),"#111"]];
+  if(v.dsc)rows.push(["Discount","– "+inr(v.dsc),"#111"]);
+  rows.push(["Paid",inr(v.paid),"#1f8a4c"]);
+  if(v.pt)rows.push(["Earlier pending",inr(v.pt),"#c2410c"]);
+  var H=700+rows.length*84+130,c=document.createElement("canvas");c.width=W;c.height=H;
+  var x=c.getContext("2d");
+  function T(t,px,wt,col,xx,yy,al,mx){x.font=wt+" "+px+"px "+F;while(mx&&px>18&&x.measureText(t).width>mx){px-=2;x.font=wt+" "+px+"px "+F}x.fillStyle=col;x.textAlign=al;x.fillText(t,xx,yy)}
+  x.fillStyle="#fff";x.fillRect(0,0,W,H);
+  x.fillStyle="#2b4acb";x.fillRect(0,0,W,140);
+  T(S.biz||"Fee Invoice",46,"700","#fff",W/2,S.biz?80:88,"center",720);
+  if(S.biz)T("FEE INVOICE",24,"600","#dfe6ff",W/2,116,"center");
+  T(s.name,58,"700","#111",W/2,225,"center",720);
+  var tg=tags(s).join("  ·  ");if(tg)T(tg,32,"500","#555",W/2,276,"center",720);
+  T(rl(s,v.k),32,"600","#333",W/2,332,"center",720);
+  var ok=v.tot<=0,by=372,bh=250;
+  x.fillStyle=ok?"#1f8a4c":"#c2410c";rr(x,40,by,720,bh,28);
+  if(ok){x.strokeStyle="#fff";x.lineWidth=22;x.lineCap="round";x.lineJoin="round";x.beginPath();x.moveTo(W/2-55,by+105);x.lineTo(W/2-18,by+142);x.lineTo(W/2+55,by+62);x.stroke();T("FEES PAID",46,"800","#fff",W/2,by+222,"center")}
+  else{T("TO PAY",36,"700","#ffe3d2",W/2,by+75,"center");T(inr(v.tot),108,"800","#fff",W/2,by+190,"center",660)}
+  rows.forEach(function(r,i){var yy=700+i*84;T(r[0],36,"500","#333",70,yy,"left");T(r[1],40,"700",r[2],W-70,yy,"right");x.fillStyle="#e8e8e8";x.fillRect(60,yy+26,W-120,2)});
+  T("Thank you",30,"500","#777",W/2,H-62,"center");T(fd(iso()),24,"400","#aaa",W/2,H-26,"center");
+  return c}
+function drawIv(){var s=gs(IV.id);if(!s)return;var c=invCanvas(inv(s,IV.k));
+  IMGN="Fee-"+s.name.replace(/[^A-Za-z0-9]+/g,"-")+"-"+IV.k+".jpg";IMGB=null;
+  document.getElementById("ivimg").src=c.toDataURL("image/jpeg",0.92);
+  c.toBlob(function(b){IMGB=b},"image/jpeg",0.92)}
 function nk(){return mk(now.getMonth()===11?now.getFullYear()+1:now.getFullYear(),(now.getMonth()+1)%12)}
 function ekey(s){return s.off?s.offKey:nk()}
 function gs(i){return S.students.filter(function(x){return x.id===i})[0]}
@@ -118,8 +165,8 @@ function fb(s,k){var f=Number(s.fee);(s.fees||[]).forEach(function(x){if(x.from<
 function dc(s,k){return Number(S.disc[k+"|"+s.id])||0}
 function feeOf(s,k){return Math.max(0,fb(s,k)-dc(s,k))}
 function owe(s){var t=tod(),y=+s.join.slice(0,4),m=+s.join.slice(5,7)-1,tot=0,l=[];while(true){var k=mk(y,m);if(cyc(s,k).a>t)break;var d=dueOf(s,k);if(d>0){tot+=d;l.push({k:k,d:d})}m++;if(m>11){m=0;y++}}return{tot:tot,l:l}}
-function remText(s,w){return "Hello! This is a gentle reminder"+(S.biz?" from "+S.biz:"")+" that "+s.name+"’s tuition fee of "+inr(w.tot)+" is pending"+(w.l.length>1?" ("+w.l.length+" months)":" ("+rl(s,w.l[0].k)+")")+". Kindly pay at the earliest. Thank you!"}
-function rcpt(s,k,i){var ps=pays(s,k),x=ps[i],b=Math.max(0,feeOf(s,k)-sum(ps.slice(0,i+1)));return (S.biz?"*"+S.biz+"*\n":"")+"Payment receipt\nStudent: "+s.name+"\nReceived: "+inr(x.a)+" ("+x.m+") on "+fd(x.d)+"\nCycle: "+rl(s,k)+"\nBalance for this cycle: "+inr(b)+(b?"":" – fully paid ✓")+"\nThank you!"}
+function remText(s,w){return "Hello! This is a gentle reminder"+(S.biz?" from "+S.biz:"")+" that "+dn(s)+"’s tuition fee of "+inr(w.tot)+" is pending"+(w.l.length>1?" ("+w.l.length+" months)":" ("+rl(s,w.l[0].k)+")")+". Kindly pay at the earliest. Thank you!"}
+function rcpt(s,k,i){var ps=pays(s,k),x=ps[i],b=Math.max(0,feeOf(s,k)-sum(ps.slice(0,i+1)));return (S.biz?"*"+S.biz+"*\n":"")+"Payment receipt\nStudent: "+dn(s)+"\nReceived: "+inr(x.a)+" ("+x.m+") on "+fd(x.d)+"\nCycle: "+rl(s,k)+"\nBalance for this cycle: "+inr(b)+(b?"":" – fully paid ✓")+"\nThank you!"}
 function ovHead(t){return '<div class="tb"><button class="bt g" data-a="hc">← Back</button><b style="align-self:center;flex:2">'+t+'</b></div>'}
 function renderHv(){
   var el=document.getElementById("hv");
@@ -129,13 +176,16 @@ function renderHv(){
     var y=+s.join.slice(0,4),m=+s.join.slice(5,7)-1,ek=ekey(s),rows=[],tp=0,td=0;
     while(mk(y,m)<ek){var k=mk(y,m),d=dueOf(s,k),pd=sum(pays(s,k));tp+=pd;td+=d;
       rows.push('<button class="st" style="width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer" data-a="iv" data-id="'+s.id+'" data-k="'+k+'"><div class="row"><b>'+esc(rl(s,k))+'</b><span class="'+(d?"wn":"ok")+'">'+(d?inr(d)+" due":"Paid ✓")+'</span></div><div class="mu">Fee '+inr(feeOf(s,k))+' · Paid '+inr(pd)+' · tap for invoice</div></button>');m++;if(m>11){m=0;y++}}
-    h=ovHead(esc(s.name))+'<div class="sm"><div class="row"><div><div class="mu">Total paid</div><div class="big ok">'+inr(tp)+'</div></div><div style="text-align:right"><div class="mu">Pending</div><div class="big wn">'+inr(td)+'</div></div></div></div>'+rows.reverse().join("")}
+    h=ovHead(esc(dn(s)))+'<div class="sm"><div class="row"><div><div class="mu">Total paid</div><div class="big ok">'+inr(tp)+'</div></div><div style="text-align:right"><div class="mu">Pending</div><div class="big wn">'+inr(td)+'</div></div></div></div>'+rows.reverse().join("")}
   else if(HV.t==="rem"){var o=[];S.students.forEach(function(s){if(s.off)return;var w=owe(s);if(w.tot>0)o.push({s:s,w:w})});
-    h=ovHead('Remind all')+'<p class="mu">Tap each WhatsApp button to send that parent a ready reminder with the amount.</p>'+(o.length?o.map(function(x){return '<div class="st"><div class="row" style="align-items:center"><div><div class="nm">'+esc(x.s.name)+'</div><div class="mu">'+inr(x.w.tot)+' pending'+(x.s.phone?'':' · no number saved')+'</div></div><a class="wa" style="flex:none" href="'+esc(waUrl(x.s,remText(x.s,x.w)))+'">WhatsApp</a></div></div>'}).join(""):'<div class="em">Nobody has pending fees 🎉</div>')}
+    h=ovHead('Remind all')+'<p class="mu">Tap each WhatsApp button to send that parent a ready reminder with the amount.</p>'+(o.length?o.map(function(x){return '<div class="st"><div class="row" style="align-items:center"><div><div class="nm">'+esc(dn(x.s))+'</div><div class="mu">'+inr(x.w.tot)+' pending'+(x.s.phone?'':' · no number saved')+'</div></div><a class="wa" style="flex:none" href="'+esc(waUrl(x.s,remText(x.s,x.w)))+'">WhatsApp</a></div></div>'}).join(""):'<div class="em">Nobody has pending fees 🎉</div>')}
   else if(HV.t==="rep"){var L2=S.students.filter(function(s){return s.start<=key&&!s.off}),bill=0,got=0,cash=0,ds=0,pend=0,pn=0,un=[];
-    L2.forEach(function(s){var ps=pays(s,key),d=dueOf(s,key);bill+=fb(s,key);ds+=dc(s,key);got+=sum(ps);cash+=sum(ps.filter(function(x){return x.m==="Cash"}));pend+=d;if(d>0)un.push(s.name+" – "+inr(d));else pn++});
+    L2.forEach(function(s){var ps=pays(s,key),d=dueOf(s,key);bill+=fb(s,key);ds+=dc(s,key);got+=sum(ps);cash+=sum(ps.filter(function(x){return x.m==="Cash"}));pend+=d;if(d>0)un.push(dn(s)+" – "+inr(d));else pn++});
     RT="Fee report – "+mlab(key)+(S.biz?" ("+S.biz+")":"")+"\n(cycles starting this month)\nBilled: "+inr(bill-ds)+"\nCollected: "+inr(got)+" (Cash "+inr(cash)+", Online "+inr(got-cash)+")\nPending: "+inr(pend)+"\nFully paid: "+pn+" of "+L2.length+(un.length?"\n\nPending:\n"+un.join("\n"):"");
     h=ovHead('Report – '+esc(mlab(key)))+'<div class="sm"><div class="mu">Cycles that start in this month</div><table style="width:100%;margin-top:8px">'+[["Fees billed",inr(bill)],["Discounts","– "+inr(ds)],["Collected",inr(got)],["↳ Cash",inr(cash)],["↳ Online",inr(got-cash)],["Pending",inr(pend)],["Fully paid",pn+" of "+L2.length]].map(function(r){return '<tr><td>'+r[0]+'</td><td style="text-align:right;font-weight:600">'+r[1]+'</td></tr>'}).join("")+'</table></div>'+(un.length?'<div class="sm"><b>Pending</b>'+un.map(function(u){return '<div class="pl"><span>'+esc(u)+'</span></div>'}).join("")+'</div>':'')+'<button class="bt" data-a="cr" style="width:100%">Copy text</button>'}
+  else if(HV.t==="pay"){var s=gs(HV.id);if(!s){HV=null;el.hidden=true;return}
+    var pk=HV.k,pp=sum(pays(s,pk)),pr=dueOf(s,pk);
+    h=ovHead('Add payment')+'<div class="sm"><div class="nm">'+esc(dn(s))+'</div><div class="mu">'+esc(rl(s,pk))+'</div><div class="row" style="margin-top:10px"><div><div class="mu">Fee</div><b>'+inr(feeOf(s,pk))+'</b></div><div><div class="mu">Paid</div><b class="ok">'+inr(pp)+'</b></div><div style="text-align:right"><div class="mu">Remaining</div><b class="wn">'+inr(pr)+'</b></div></div></div><div class="sm"><div class="mu">Amount received (₹)</div><input id="pa2" type="number" inputmode="numeric" value="'+esc(PA)+'"><div class="sg"><button data-a="pm2" data-v="Cash" class="'+(PM==="Cash"?"on":"")+'">Cash</button><button data-a="pm2" data-v="Online" class="'+(PM==="Online"?"on":"")+'">Online</button></div>'+(PE?'<div class="er">'+esc(PE)+'</div>':'')+'<div class="ed"><button class="bt" data-a="sp2" data-id="'+s.id+'" data-k="'+pk+'">Save payment</button><button class="bt g" data-a="hc">Cancel</button></div></div>'}
   else if(HV.t==="tools"){
     h=ovHead('Backup &amp; PIN')+'<div class="sm"><b>Backup</b><p class="mu">Copy your data and save it somewhere safe (WhatsApp “message yourself”, Notes). Do this every week.</p><button class="bt" data-a="bk" style="width:100%">Copy backup</button></div><div class="sm"><b>Restore</b><p class="mu">Paste a backup below. This replaces the data on this device.</p><textarea id="rs" rows="4" style="width:100%;font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)">'+esc(RV)+'</textarea><button class="bt r" data-a="rs" style="width:100%;margin-top:8px">'+(RSC?'Tap again to restore':'Restore backup')+'</button></div>'+(MSG?'<div class="er" style="text-align:center">'+esc(MSG)+'</div>':'')+'<div class="sm"><b>App lock</b>'+(S.pin?'<p class="mu">PIN is on.</p><button class="bt g" data-a="rp" style="width:100%">Remove PIN</button>':'<p class="mu">Set a 4-digit PIN to keep fee details private. If you forget it, the only way in is erasing all data, so keep a backup.</p><input id="np" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"><button class="bt" data-a="spin" style="width:100%;margin-top:8px">Set PIN</button>')+'</div>'}
   el.hidden=false;el.innerHTML='<div style="max-width:560px;margin:0 auto">'+h+'</div>'}
@@ -166,23 +216,23 @@ function inv(s,k){var ps=pays(s,k),paid=sum(ps),fee=fb(s,k),dsc=dc(s,k),pd=prev(
 function render(){
   var key=cur();
   document.getElementById("ml").textContent=mlab(key);
-  var AL=alerts();document.getElementById("al").innerHTML=AL.length?'<div class="sm" style="border-color:var(--wn)"><div style="font-weight:700;color:var(--wn)">🔔 Month completed – fees due</div>'+AL.map(function(x){return '<div class="pl" style="align-items:flex-start;gap:8px"><span><b>'+esc(x.s.name)+'</b><br><span class="mu">'+(x.n>1?x.n+' cycles pending':'Cycle '+esc(rl(x.s,x.last))+' completed')+' · <b>'+inr(x.tot)+'</b></span></span><span style="display:flex;gap:6px"><button class="pb s" data-a="go" data-id="'+x.s.id+'" data-k="'+x.first+'">Open</button><button class="pb" data-a="iv" data-id="'+x.s.id+'" data-k="'+x.last+'">Invoice</button></span></div>'}).join("")+'</div>':"";
+  var AL=alerts();document.getElementById("al").innerHTML=AL.length?'<div class="sm" style="border-color:var(--wn)"><div style="font-weight:700;color:var(--wn)">🔔 Month completed – '+AL.length+' student'+(AL.length>1?'s':'')+' with fees due</div>'+AL.map(function(x){return '<div class="pl" style="align-items:flex-start;gap:8px"><span><b>'+esc(dn(x.s))+'</b><br><span class="mu">'+(x.n>1?x.n+' cycles pending':'Cycle '+esc(rl(x.s,x.last))+' completed')+' · <b>'+inr(x.tot)+'</b></span></span><span style="display:flex;gap:6px"><button class="pb s" data-a="go" data-id="'+x.s.id+'" data-k="'+x.first+'">Pay</button><button class="pb" data-a="iv" data-id="'+x.s.id+'" data-k="'+x.last+'">Invoice</button></span></div>'}).join("")+'</div>':"";
   var L=S.students.filter(function(s){return s.start<=key&&!s.off});
   var paidN=0,got=0,cash=0,due=0;
   L.forEach(function(s){var ps=pays(s,key);got+=sum(ps);cash+=sum(ps.filter(function(x){return x.m==="Cash"}));var d=dueOf(s,key);due+=d;if(d===0)paidN++});
   var tot=got+due,pct=tot?Math.round(got/tot*100):0;
   document.getElementById("sm").innerHTML=
     '<div class="row"><div><div class="mu">Collected</div><div class="big ok">'+inr(got)+'</div><div class="mu">Cash '+inr(cash)+' · Online '+inr(got-cash)+'</div></div><div style="text-align:right"><div class="mu">Pending</div><div class="big wn">'+inr(due)+'</div></div></div>'+
-    '<div class="bar"><i style="width:'+pct+'%"></i></div><div class="mu" style="margin-top:6px">'+paidN+' of '+L.length+' students fully paid</div>';
+    '<div class="bar"><i style="width:'+pct+'%"></i></div><div class="mu" style="margin-top:6px">'+L.length+' student'+(L.length===1?'':'s')+' · '+paidN+' fully paid</div>';
   var tabs=[["all","All ("+L.length+")"],["un","Unpaid ("+(L.length-paidN)+")"],["pd","Paid ("+paidN+")"],["in","Inactive ("+S.students.filter(function(s){return s.off}).length+")"]];
   document.getElementById("ch").innerHTML=tabs.map(function(t){return '<button data-a="f" data-v="'+t[0]+'" class="'+(F===t[0]?"on":"")+'">'+t[1]+'</button>'}).join("");
-  var V=(F==="in"?S.students.filter(function(s){return s.off}):L.filter(function(s){var d=dueOf(s,key);return F==="all"||(F==="un"?d>0:d===0)})).filter(function(s){return !Q||s.name.toLowerCase().indexOf(Q)>-1});
+  var V=(F==="in"?S.students.filter(function(s){return s.off}):L.filter(function(s){var d=dueOf(s,key);return F==="all"||(F==="un"?d>0:d===0)})).filter(function(s){return (!Q||dn(s).toLowerCase().indexOf(Q)>-1)&&(!FS||String(s.std)===FS)&&(!FB||s.board===FB)});
   var ls=document.getElementById("ls");
   if(!V.length)ls.innerHTML='<div class="em">'+(L.length||F==="in"||Q?"Nothing here.":"No students yet. Add your first one below.")+'</div>';
   else ls.innerHTML=V.map(function(s){
-    if(s.off){var po=prev(s,s.offKey).reduce(function(t,x){return t+x.d},0);return '<div class="st"><div class="nm">'+esc(s.name)+' <span class="mu">(inactive)</span></div><div class="mu">Joined '+esc(fd(s.join))+'</div>'+(po?'<span class="bd">'+inr(po)+' unpaid from before leaving</span>':'<span class="bd g">No dues</span>')+'<div class="ed"><button class="pb s" data-a="hs" data-id="'+s.id+'">History</button><button class="pb" data-a="on" data-id="'+s.id+'">Reactivate</button></div></div>'}
+    if(s.off){var po=prev(s,s.offKey).reduce(function(t,x){return t+x.d},0);return '<div class="st"><div class="nm">'+esc(dn(s))+' <span class="mu">(inactive)</span></div><div class="mu">Joined '+esc(fd(s.join))+'</div>'+(po?'<span class="bd">'+inr(po)+' unpaid from before leaving</span>':'<span class="bd g">No dues</span>')+'<div class="ed"><button class="pb s" data-a="hs" data-id="'+s.id+'">History</button><button class="pb" data-a="on" data-id="'+s.id+'">Reactivate</button></div></div>'}
     var ps=pays(s,key),paid=sum(ps),d=dueOf(s,key),pv=prev(s,key),pt=pv.reduce(function(t,x){return t+x.d},0),id=s.id;
-    var h='<div class="st"><div class="nm">'+esc(s.name)+'</div><div class="mu">'+inr(fb(s,key))+' / month · Joined '+esc(fd(s.join))+'</div><div class="mu">Cycle '+esc(rl(s,key))+' · '+cst(s,key)+'</div>';
+    var h='<div class="st"><div class="nm">'+esc(s.name)+'</div>'+tgh(s)+'<div class="mu">'+inr(fb(s,key))+' / month · Joined '+esc(fd(s.join))+'</div><div class="mu">Cycle '+esc(rl(s,key))+' · '+cst(s,key)+'</div>';
     if(d===0)h+='<span class="bd g">Paid in full ✓</span>';
     else if(paid>0)h+='<span class="bd">'+inr(paid)+' paid · '+inr(d)+' left</span>';
     else h+='<span class="bd">'+inr(d)+' due</span>';
@@ -195,10 +245,10 @@ function render(){
       h+='<div class="ed">'+(d>0?'<button class="pb" data-a="op" data-id="'+id+'">+ Add payment</button>':'')+'<button class="pb s" data-a="iv" data-id="'+id+'">Invoice</button></div>'}
     if(DC===id)h+='<div class="pn"><div class="mu">Discount for this cycle (₹)</div><input id="dca" type="number" inputmode="numeric" value="'+dc(s,key)+'"><div class="ed"><button class="bt" data-a="dcs" data-id="'+id+'">Save</button><button class="bt g" data-a="dcc">Cancel</button></div></div>';
     if(ED===id){
-      h+='<div class="ed"><input id="en" value="'+esc(s.name)+'" placeholder="Name"></div><div class="mu" style="margin-top:8px">Changing the fee applies from this month onward.</div><div class="ed"><input id="ef" type="number" inputmode="numeric" value="'+fb(s,key)+'" style="flex:1;min-width:0"><input id="ep" type="tel" value="'+esc(s.phone||"")+'" placeholder="Parent’s WhatsApp" style="flex:1;min-width:0"></div><div class="ed"><span class="mu">Joining date</span><input id="ej" type="date" value="'+esc(s.join)+'" style="flex:1;min-width:0"></div><div class="ed"><button class="bt" data-a="sv" data-id="'+id+'">Save</button><button class="bt g" data-a="ce">Cancel</button><button class="bt g" data-a="off" data-id="'+id+'">Mark inactive</button><button class="bt r" data-a="rm" data-id="'+id+'">'+(RM===id?"Tap again to remove":"Remove student")+'</button></div>'}
+      h+='<div class="ed"><input id="en" value="'+esc(s.name)+'" placeholder="Name"></div><div class="ed"><select id="es">'+optStd(s.std)+'</select><select id="est"'+(+s.std>=11?'':' hidden')+'>'+optStr(s.stream)+'</select><select id="eb">'+optBrd(s.board)+'</select></div><div class="mu" style="margin-top:8px">Changing the fee applies from this month onward.</div><div class="ed"><input id="ef" type="number" inputmode="numeric" value="'+fb(s,key)+'" style="flex:1;min-width:0"><input id="ep" type="tel" value="'+esc(s.phone||"")+'" placeholder="Parent’s WhatsApp" style="flex:1;min-width:0"></div><div class="ed"><span class="mu">Joining date</span><input id="ej" type="date" value="'+esc(s.join)+'" style="flex:1;min-width:0"></div><div class="ed"><button class="bt" data-a="sv" data-id="'+id+'">Save</button><button class="bt g" data-a="ce">Cancel</button><button class="bt g" data-a="off" data-id="'+id+'">Mark inactive</button><button class="bt r" data-a="rm" data-id="'+id+'">'+(RM===id?"Tap again to remove":"Remove student")+'</button></div>'}
     else h+='<div class="ed" style="gap:14px"><button class="lk" data-a="hs" data-id="'+id+'">History</button><button class="lk" data-a="dc" data-id="'+id+'">Discount</button><button class="lk" data-a="ed" data-id="'+id+'">Edit student</button></div>';
     return h+'</div>'}).join("");
-  renderHv();renderIv();renderLock()}
+  renderFl();renderHv();renderIv();renderLock()}
 function waUrl(s,txt){var n=String(s.phone||"").replace(/\D/g,"");if(n.length===10)n="91"+n;var q=encodeURIComponent(txt);if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))return "whatsapp://send?"+(n?"phone="+n+"&":"")+"text="+q;return "https://wa.me/"+n+"?text="+q}
 function invText(v){var b=S.biz||"Tuition Fee Invoice",t="*"+b+"*\nFee summary for "+rl(v.s,v.k)+"\n\nStudent: "+v.s.name+"\nMonthly fee: "+inr(v.fee)+(v.dsc?" (discount "+inr(v.dsc)+")":"")+"\n";
   if(v.ps.length){t+="\nPayments received:\n";v.ps.forEach(function(x){t+="• "+fd(x.d)+" – "+x.m+" – "+inr(x.a)+"\n"})}
@@ -209,22 +259,17 @@ function invText(v){var b=S.biz||"Tuition Fee Invoice",t="*"+b+"*\nFee summary f
 function renderIv(){
   var el=document.getElementById("iv");
   if(!IV){el.hidden=true;document.body.style.overflow="";return}
-  var s=S.students.filter(function(x){return x.id===IV.id})[0];
-  if(!s){IV=null;el.hidden=true;return}
-  var v=inv(s,IV.k),st=v.bal===0?["pd","PAID"]:v.paid>0?["pt","PARTIAL"]:["un","UNPAID"];
-  var rows='<tr class="h"><td>Description</td><td>Amount</td></tr><tr><td>Tuition fee – '+esc(rl(s,v.k))+'</td><td>'+inr(v.fee)+'</td></tr>'+(v.dsc?'<tr><td>Discount</td><td>– '+inr(v.dsc)+'</td></tr>':'');
-  var pr=v.ps.length?v.ps.map(function(x){return '<tr><td>Paid on '+esc(fd(x.d))+' ('+esc(x.m)+')</td><td>– '+inr(x.a)+'</td></tr>'}).join(""):'<tr><td>No payment received yet</td><td>–</td></tr>';
-  var pv=v.pd.map(function(x){return '<tr><td>Pending from '+esc(rl(s,x.k))+'</td><td>'+inr(x.d)+'</td></tr>'}).join("");
+  var s=gs(IV.id);if(!s){IV=null;el.hidden=true;return}
   el.hidden=false;document.body.style.overflow="hidden";
-  el.innerHTML='<div class="tb"><button class="bt g" data-a="ci">← Back</button><a class="wa" id="wa" href="'+esc(waUrl(s,invText(v)))+'">Send on WhatsApp</a><button class="bt" data-a="cpy">Copy text</button><button class="bt g" data-a="pr">Print</button></div>'+
-  '<div class="pp"><div class="t"><div style="flex:1"><input class="bz" id="bz" placeholder="Your tuition name" value="'+esc(S.biz)+'"><div style="color:#777;margin-top:4px">Fee invoice · Issued '+esc(fd(iso()))+'</div></div><div class="stp '+st[0]+'">'+st[1]+'</div></div>'+
-  '<div style="color:#777;font-size:12px">BILLED TO (PARENT OF)</div><div style="font-size:17px;font-weight:700;margin-bottom:8px">'+esc(s.name)+'</div>'+
-  '<table>'+rows+pr+'<tr class="h"><td>Summary</td><td></td></tr><tr><td>Total paid</td><td>'+inr(v.paid)+'</td></tr><tr><td>Balance for '+esc(rl(s,v.k))+'</td><td>'+inr(v.bal)+'</td></tr>'+pv+'<tr class="tt"><td>Total outstanding</td><td>'+inr(v.tot)+'</td></tr></table>'+
-  (v.tot>0?'<div class="no">Reminder: please clear the pending '+inr(v.tot)+' at the earliest. Thank you!</div>':'<div class="no" style="background:#e3f4ea;color:#1f6b3c">All fees are cleared. Thank you!</div>')+'</div>'}
+  el.innerHTML='<div class="tb"><button class="bt g" data-a="ci">← Back</button><button class="wa" data-a="shr" style="border:0;cursor:pointer">Share on WhatsApp</button><button class="bt" data-a="sav">Save image</button></div><div style="max-width:560px;margin:0 auto"><input id="bz" placeholder="Your tuition name (shown on invoice)" value="'+esc(S.biz)+'" style="margin-bottom:10px"><img id="ivimg" alt="Invoice" style="width:100%;border-radius:12px;border:1px solid var(--bd);display:block"><p class="mu" style="text-align:center">Tap “Share on WhatsApp”, choose WhatsApp, then pick the parent’s chat.</p></div>';
+  drawIv()}
 document.addEventListener("input",function(e){
   if(e.target.id==="q"){Q=e.target.value.trim().toLowerCase();render();return}
   if(e.target.id==="lp"&&e.target.value.length===4){if(e.target.value===S.pin){UNL=true;LE=""}else LE="Wrong PIN";render();return}
-  if(e.target.id==="bz"){S.biz=e.target.value;save();var w=document.getElementById("wa"),s=S.students.filter(function(x){return x.id===IV.id})[0];if(w&&s)w.href=waUrl(s,invText(inv(s,IV.k)))}});
+  if(e.target.id==="bz"){S.biz=e.target.value;save();drawIv()}});
+document.addEventListener("change",function(e){var t=e.target.id;
+  if(t==="fs"){FS=e.target.value;render()}else if(t==="fb"){FB=e.target.value;render()}
+  else if(t==="as"||t==="es"){var st=document.getElementById(t==="as"?"ast":"est");st.hidden=!(+e.target.value>=11);if(st.hidden)st.value=""}});
 function copyTxt(t,b){var o=b.textContent;
   function ok(){b.textContent="Copied ✓";setTimeout(function(){b.textContent=o},1500)}
   try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}
@@ -235,6 +280,10 @@ document.addEventListener("click",function(ev){
   function stu(i){return S.students.filter(function(x){return x.id===i})[0]}
   if(a==="pr"){try{window.print()}catch(e){}return}
   if(a==="cpy"){var s0=stu(IV.id);copyTxt(invText(inv(s0,IV.k)),b);return}
+  if(a==="shr"||a==="sav"){if(!IMGB)return;
+    var fl=new File([IMGB],IMGN,{type:"image/jpeg"});
+    if(a==="shr"&&navigator.canShare&&navigator.canShare({files:[fl]})){navigator.share({files:[fl],title:"Fee invoice"}).catch(function(){});return}
+    var u=URL.createObjectURL(IMGB),l=document.createElement("a");l.href=u;l.download=IMGN;document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);return}
   if(a==="cr"){copyTxt(RT,b);return}
   if(a==="bk"){copyTxt(JSON.stringify(Object.assign({},S,{pin:""})),b);return}
   if(a==="prev"){M--;if(M<0){M=11;Y--}}
@@ -252,16 +301,16 @@ document.addEventListener("click",function(ev){
     else{S.pay[key]=S.pay[key]||{};S.pay[key][id]=S.pay[key][id]||[];S.pay[key][id].push({d:iso(),a:amt,m:PM});PAY=null;PE="";save()}}
   else if(a==="dp"){var k=id+":"+b.dataset.i;if(DP!==k)DP=k;else{S.pay[key][id].splice(+b.dataset.i,1);DP=null;save()}}
   else if(a==="sv"){
-    var n=document.getElementById("en").value.trim(),f=Number(document.getElementById("ef").value),ph=document.getElementById("ep").value.trim(),jj=document.getElementById("ej").value;
+    var n=document.getElementById("en").value.trim(),f=Number(document.getElementById("ef").value),ph=document.getElementById("ep").value.trim(),jj=document.getElementById("ej").value,sd2=document.getElementById("es").value,st2=document.getElementById("est").value,bd2=document.getElementById("eb").value;
     if(!n||!(f>=0))return;
-    S.students.forEach(function(x){if(x.id===id){x.name=n;x.phone=ph;if(f!==fb(x,key)){x.fees=(x.fees||[]).filter(function(z){return z.from!==key}).concat([{from:key,fee:f}]).sort(function(p,q){return p.from<q.from?-1:1})}if(jj){x.join=jj;x.start=jj.slice(0,7)}}});ED=null;save()}
+    S.students.forEach(function(x){if(x.id===id){x.name=n;x.phone=ph;x.std=sd2;x.stream=(+sd2>=11?st2:"");x.board=bd2;if(f!==fb(x,key)){x.fees=(x.fees||[]).filter(function(z){return z.from!==key}).concat([{from:key,fee:f}]).sort(function(p,q){return p.from<q.from?-1:1})}if(jj){x.join=jj;x.start=jj.slice(0,7)}}});ED=null;save()}
   else if(a==="rm"){
     if(RM!==id)RM=id;
     else{S.students=S.students.filter(function(x){return x.id!==id});Object.keys(S.pay).forEach(function(k){delete S.pay[k][id]});ED=null;RM=null;save()}}
   else if(a==="add"){
     var an=document.getElementById("an"),af=document.getElementById("af"),ap=document.getElementById("ap"),nm=an.value.trim(),fe=Number(af.value),jn=document.getElementById("aj").value||iso();
     if(!nm||!(fe>0)){(nm?af:an).focus();return}
-    S.students.push({id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:nm,fee:fe,phone:ap.value.trim(),join:jn,start:jn.slice(0,7)});Y=+jn.slice(0,4);M=+jn.slice(5,7)-1;
+    S.students.push({id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:nm,fee:fe,phone:ap.value.trim(),join:jn,start:jn.slice(0,7),std:document.getElementById("as").value,stream:(+document.getElementById("as").value>=11?document.getElementById("ast").value:""),board:document.getElementById("ab").value});Y=+jn.slice(0,4);M=+jn.slice(5,7)-1;
     an.value="";af.value="";ap.value="";save()}
   else if(a==="iv"){IV={id:id,k:b.dataset.k||key};document.getElementById("iv").scrollTop=0}
   else if(a==="ci"){IV=null}
@@ -280,10 +329,15 @@ document.addEventListener("click",function(ev){
   else if(a==="rp"){S.pin="";save();MSG="PIN removed."}
   else if(a==="ul"){var lq=document.getElementById("lp").value;if(lq===S.pin){UNL=true;LE=""}else LE="Wrong PIN"}
   else if(a==="fg"){if(!FG){FG=true;LE="Forgot PIN erases ALL data. Tap again to erase."}else{S={students:[],pay:{},disc:{},biz:""};save();UNL=true;FG=false;LE=""}}
-  else if(a==="go"){Y=+b.dataset.k.slice(0,4);M=+b.dataset.k.slice(5)-1;F="all";PAY=id;PM="Cash";PE="";PA=String(dueOf(stu(id),b.dataset.k));window.scrollTo(0,0)}
+  else if(a==="go"){HV={t:"pay",id:id,k:b.dataset.k};PM="Cash";PE="";PA=String(dueOf(gs(id),b.dataset.k))}
+  else if(a==="pm2"){var pi2=document.getElementById("pa2");if(pi2)PA=pi2.value;PM=b.dataset.v}
+  else if(a==="sp2"){var s2=gs(id),k2=b.dataset.k,am=Number(document.getElementById("pa2").value),d2=dueOf(s2,k2);PA=document.getElementById("pa2").value;
+    if(!(am>0))PE="Enter the amount received.";else if(am>d2)PE="That is more than the remaining "+inr(d2)+".";
+    else{S.pay[k2]=S.pay[k2]||{};S.pay[k2][id]=S.pay[k2][id]||[];S.pay[k2][id].push({d:iso(),a:am,m:PM});HV=null;PE="";save()}}
   if(a!=="dp")DP=null;
   render()});
 render();document.getElementById("aj").value=iso();
+document.getElementById("as").innerHTML=optStd("");document.getElementById("ast").innerHTML=optStr("");document.getElementById("ab").innerHTML=optBrd("");
 </script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){try{navigator.serviceWorker.register("sw.js")}catch(e){}})}</script>
 </body>
